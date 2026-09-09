@@ -20,6 +20,7 @@ grep -q '^RUN python3 -m uvicorn --version$' Dockerfile
 grep -q 'COPY --from=python-deps /install /usr/local/lib/python3.11/dist-packages' Dockerfile
 grep -q '^exec python3 -m uvicorn main:app ' rootfs/usr/local/bin/start-backend
 ! grep -q 'ln -s /usr/bin/python3 /usr/local/bin/python' Dockerfile
+test "$(grep -c 'docker port "\$name" 3000/tcp' tests/smoke.sh)" -eq 2
 bash -n rootfs/usr/local/bin/aio-entrypoint rootfs/usr/local/bin/start-backend
 sh -n rootfs/usr/local/bin/aio-healthcheck
 python3 - <<'PY'

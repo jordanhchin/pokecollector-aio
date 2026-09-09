@@ -131,6 +131,10 @@ echo '[phase] same-container restart'
 check 'container stops gracefully' docker stop -t 60 "$name"
 check 'same container restarts' docker start "$name"
 wait_healthy 'restarted container health'
+# Docker can assign a different ephemeral host port each time this container
+# starts, so refresh the published binding before post-restart HTTP checks.
+port=$(docker port "$name" 3000/tcp | sed 's/.*://')
+check 'published nginx port rediscovered after restart' test -n "$port"
 restarted_system_id=$(docker exec "$name" psql -U pokemon -d pokemon_tcg -Atqc \
   'SELECT system_identifier FROM pg_control_system()')
 check_equal 'PostgreSQL system identifier persisted' "$restarted_system_id" "$system_id"
