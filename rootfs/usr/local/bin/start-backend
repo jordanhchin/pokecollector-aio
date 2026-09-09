@@ -11,4 +11,4 @@ if [[ -e /config/postgresql/.first-run ]]; then
   rm -f /config/postgresql/.first-run
 fi
 cd /opt/pokecollector/backend
-exec uvicorn main:app --host 127.0.0.1 --port 8000 --proxy-headers --forwarded-allow-ips=127.0.0.1
+exec python3 -m uvicorn main:app --host 127.0.0.1 --port 8000 --proxy-headers --forwarded-allow-ips=127.0.0.1
