@@ -19,7 +19,7 @@ RUN npm ci \
 
 FROM python:3.11-slim-bookworm AS python-deps
 COPY --from=source /src/backend/requirements.txt /tmp/requirements.txt
-RUN pip install --no-cache-dir --prefix=/install -r /tmp/requirements.txt
+RUN pip install --no-cache-dir --target=/install -r /tmp/requirements.txt
 
 FROM postgres:18-bookworm
 ARG UPSTREAM_REF
@@ -31,9 +31,9 @@ LABEL org.opencontainers.image.source="https://github.com/jordanhchin/pokecollec
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends python3 nginx supervisor curl ca-certificates \
- && ln -s /usr/bin/python3 /usr/local/bin/python \
  && rm -rf /var/lib/apt/lists/* /etc/nginx/sites-enabled/default
-COPY --from=python-deps /install /usr/local
+COPY --from=python-deps /install /usr/local/lib/python3.11/dist-packages
+RUN python3 -m uvicorn --version
 COPY --from=source /src/backend /opt/pokecollector/backend
 COPY --from=source /src/VERSION /opt/pokecollector/VERSION
 COPY --from=frontend /src/frontend/dist /usr/share/nginx/html
