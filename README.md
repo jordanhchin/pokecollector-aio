@@ -4,6 +4,8 @@ An **unofficial**, all-in-one Docker packaging of [Git-Romer/pokecollector](http
 
 The image pins upstream **v1.41.0** at commit `dcff367f983b35688576a94b3ef79d20f3041cb1`; builds never follow a moving branch. Only the nginx web port is exposed. PostgreSQL and FastAPI listen on loopback inside the container.
 
+The current image supports **AMD64/x86-64 Unraid systems only**. ARM64 images are not currently published.
+
 ## Install
 
 ```bash
@@ -44,7 +46,7 @@ The bundled nginx configuration retains the pinned upstream security headers and
 
 ## Upgrade and image tags
 
-Back up first, pull a chosen tag, remove the old container, and recreate it with the same `/config` mount and environment. Releases publish `latest`, the repository release tag (for example `1.2.0`), major/minor (`1.2`), and major (`1`) for `linux/amd64` and `linux/arm64`. Prefer a full version tag for reproducibility. `latest` tracks the newest packaging release, not the upstream default branch.
+Back up first, pull a chosen tag, remove the old container, and recreate it with the same `/config` mount and environment. Releases publish `latest`, the repository release tag (for example `1.2.0`), major/minor (`1.2`), and major (`1`) for `linux/amd64` only. Prefer a full version tag for reproducibility. `latest` tracks the newest packaging release, not the upstream default branch.
 
 Never downgrade PostgreSQL data or the application without restoring a matching backup. Upstream automatically writes pre-migration SQL dumps in `/config/backups`; startup fails if a required safety backup cannot be made.
 
