@@ -3,8 +3,10 @@ set -Eeuo pipefail
 until pg_isready -q -h 127.0.0.1 -U "$POSTGRES_USER"; do sleep 1; done
 if [[ -e /config/postgresql/.first-run ]]; then
   if [[ "$POSTGRES_DB" != postgres ]]; then
-    exists=$(runuser -u postgres -- psql -Atqc "SELECT 1 FROM pg_database WHERE datname = '$POSTGRES_DB'" postgres)
-    [[ "$exists" == 1 ]] || runuser -u postgres -- createdb -O "$POSTGRES_USER" "$POSTGRES_DB"
+    exists=$(runuser -u postgres -- psql --username="$POSTGRES_USER" -Atqc \
+      "SELECT 1 FROM pg_database WHERE datname = '$POSTGRES_DB'" postgres)
+    [[ "$exists" == 1 ]] || runuser -u postgres -- createdb \
+      --username="$POSTGRES_USER" --owner="$POSTGRES_USER" "$POSTGRES_DB"
   fi
   rm -f /config/postgresql/.first-run
 fi

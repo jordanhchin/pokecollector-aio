@@ -14,6 +14,8 @@ grep -q 'Content-Security-Policy' rootfs/etc/nginx/conf.d/default.conf
 grep -q 'proxy_pass http://127.0.0.1:8000' rootfs/etc/nginx/conf.d/default.conf
 grep -q '^command=postgres -D /config/postgresql/data$' rootfs/etc/supervisor/supervisord.conf
 ! grep -q '/usr/local/bin/postgres' rootfs/etc/supervisor/supervisord.conf
+test "$(grep -c -- '--username="$POSTGRES_USER"' rootfs/usr/local/bin/start-backend)" -eq 2
+! grep -Eq 'runuser -u postgres -- psql -|runuser -u postgres -- createdb -O' rootfs/usr/local/bin/start-backend
 bash -n rootfs/usr/local/bin/aio-entrypoint rootfs/usr/local/bin/start-backend
 sh -n rootfs/usr/local/bin/aio-healthcheck
 python3 - <<'PY'
