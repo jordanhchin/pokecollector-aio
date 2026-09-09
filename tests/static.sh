@@ -10,6 +10,9 @@ grep -q 'JWT_SECRET_FILE=/config/auth/jwt_secret.key' Dockerfile
 grep -q 'ln -s /config/backups /app/backups' Dockerfile
 ! grep -q 'AUTH_DATA_DIR\|/config/other' Dockerfile rootfs/usr/local/bin/aio-entrypoint
 grep -q '<TailscaleStateDir>/config/.tailscale_state</TailscaleStateDir>' unraid/pokecollector-aio.xml
+grep -q 'platforms: linux/amd64$' .github/workflows/image.yml
+! grep -q 'setup-qemu-action\|linux/arm64' .github/workflows/image.yml
+grep -q 'AMD64/x86-64 Unraid systems only' README.md
 grep -q 'Content-Security-Policy' rootfs/etc/nginx/conf.d/default.conf
 grep -q 'proxy_pass http://127.0.0.1:8000' rootfs/etc/nginx/conf.d/default.conf
 grep -q '^command=postgres -D /config/postgresql/data$' rootfs/etc/supervisor/supervisord.conf

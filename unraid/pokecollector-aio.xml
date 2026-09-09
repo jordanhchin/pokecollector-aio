@@ -8,7 +8,7 @@
   <Privileged>false</Privileged>
   <Support>https://github.com/jordanhchin/pokecollector-aio/issues</Support>
   <Project>https://github.com/Git-Romer/pokecollector</Project>
-  <Overview>Unofficial all-in-one packaging of PokéCollector with PostgreSQL, FastAPI, React, and nginx. Only the web interface is published.</Overview>
+  <Overview>Unofficial AMD64/x86-64 all-in-one packaging of PokéCollector for Unraid, with PostgreSQL, FastAPI, React, and nginx. Only the web interface is published.</Overview>
   <Category>Productivity: Tools:</Category>
   <WebUI>http://[IP]:[PORT:3000]/</WebUI>
   <TailscaleStateDir>/config/.tailscale_state</TailscaleStateDir>
