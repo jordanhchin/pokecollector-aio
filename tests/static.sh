@@ -12,6 +12,8 @@ grep -q 'ln -s /config/backups /app/backups' Dockerfile
 grep -q '<TailscaleStateDir>/config/.tailscale_state</TailscaleStateDir>' unraid/pokecollector-aio.xml
 grep -q 'Content-Security-Policy' rootfs/etc/nginx/conf.d/default.conf
 grep -q 'proxy_pass http://127.0.0.1:8000' rootfs/etc/nginx/conf.d/default.conf
+grep -q '^command=postgres -D /config/postgresql/data$' rootfs/etc/supervisor/supervisord.conf
+! grep -q '/usr/local/bin/postgres' rootfs/etc/supervisor/supervisord.conf
 bash -n rootfs/usr/local/bin/aio-entrypoint rootfs/usr/local/bin/start-backend
 sh -n rootfs/usr/local/bin/aio-healthcheck
 python3 - <<'PY'
