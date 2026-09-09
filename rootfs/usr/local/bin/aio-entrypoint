@@ -11,7 +11,11 @@ fi
 export PGDATA=/config/postgresql/data
 export DATABASE_URL="${DATABASE_URL:-postgresql://${POSTGRES_USER}:$(python3 -c 'import os,urllib.parse; print(urllib.parse.quote(os.environ.get("POSTGRES_PASSWORD",""),safe=""))')@127.0.0.1:5432/${POSTGRES_DB}}"
 
-install -d -m 0750 /config/{app,uploads,backups,auth,scan-traces,logs,other} "$PGDATA"
+# A bind mount created by mktemp (and some Unraid share configurations) can be
+# mode 0700. PostgreSQL is unprivileged and needs to traverse the mount root.
+chown root:postgres /config
+chmod 0750 /config
+install -d -m 0750 /config/{app,uploads,backups,auth,scan-traces,logs} "$PGDATA"
 chown -R postgres:postgres /config/postgresql /run/postgresql
 if [[ -s "$PGDATA/PG_VERSION" ]] && [[ "$(cat "$PGDATA/PG_VERSION")" != "18" ]]; then
   echo >&2 "Unsupported PostgreSQL data version $(cat "$PGDATA/PG_VERSION"); migrate it to 18 before starting."; exit 1

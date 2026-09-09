@@ -36,7 +36,11 @@ Open `http://SERVER:3000`. `POSTGRES_PASSWORD` is mandatory when `/config/postgr
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | empty | Optional notifications |
 | `PRE_UPGRADE_BACKUP_ENABLED`, `PRE_UPGRADE_BACKUP_REQUIRED`, `PRE_UPGRADE_BACKUP_KEEP` | `true`, `true`, `10` | Migration safety backups |
 
-All durable state is below the single `/config` mount: `postgresql/data`, `app`, `uploads`, `backups`, `auth`, `scan-traces`, `logs`, and `other`. Startup creates missing paths securely, initializes PostgreSQL only when `PG_VERSION` is absent, rejects incompatible database major versions, waits for readiness, creates the database once, and then lets the upstream idempotent startup migrations run. Supervisor forwards termination and gives the API time to shut down before PostgreSQL.
+All durable state is below the single `/config` mount: PostgreSQL uses `postgresql/data`; Pokédex images use `app/pokedex-images`; scanner uploads use `uploads`; both pre-upgrade and interactive SQL backups use `backups`; the generated JWT key uses `auth/jwt_secret.key`; opted-in scanner diagnostics use `scan-traces`; and debug output uses `logs`. `SCAN_TRACE_STORAGE_DIR` always points at the persistent trace location so the application can remove previously collected traces, while trace collection remains off unless `SCAN_TRACE_DIR=/config/scan-traces` is explicitly set. No generic “other” directory or unused application-data environment variable is created.
+
+Startup makes restrictive bind mounts traversable by the unprivileged PostgreSQL process without making the database directory public, initializes PostgreSQL only when `PG_VERSION` is absent, rejects incompatible database major versions, waits for readiness, creates the database once, and then lets the upstream idempotent startup migrations run. Supervisor forwards termination and gives the API time to shut down before PostgreSQL. The upstream interactive backup API has a fixed `/app/backups` path, so the image makes that path a symbolic link to `/config/backups`; the pre-upgrade backup service is configured there directly.
+
+The bundled nginx configuration retains the pinned upstream security headers and Content-Security-Policy, gzip types and threshold, 500 MB server upload limit, 100 MB API upload limit, cache behavior, and API proxy timeouts. Its only intentional deployment changes are listening on the configurable AIO web port and proxying FastAPI over loopback instead of the Compose service hostname.
 
 ## Upgrade and image tags
 
@@ -84,7 +88,9 @@ Common issues:
 
 Install using [`unraid/pokecollector-aio.xml`](unraid/pokecollector-aio.xml), map `/config` to an appdata directory, set strong database/admin passwords, and publish container port `3000` only. Do not publish ports 5432 or 8000.
 
-With the Unraid Tailscale plugin, leave the container on the normal bridge network and visit `http://UNRAID-TAILSCALE-IP:HOST_PORT` from an authenticated tailnet device. Restrict the host port using Tailscale ACLs/grants; do not set the container to the Tailscale interface or expose its internal database/API ports. HTTPS can be supplied by a trusted reverse proxy or Tailscale Serve; when proxying, configure `CORS_ORIGINS` for the public origin if needed.
+On Unraid 7, the template declares `/config/.tailscale_state` as its Tailscale state directory. Enable **Use Tailscale** in the container settings to give PokéCollector its own Tailnet device identity and MagicDNS hostname, then select the desired Tailscale network access mode. Keep container port 3000 as the web service and never expose its internal database or API ports. Apply Tailscale ACLs/grants to that device identity.
+
+Optionally configure **Tailscale Serve** in Unraid's container integration to publish port 3000 as HTTPS on the container's Tailnet hostname. Use the resulting HTTPS origin in `CORS_ORIGINS` if cross-origin access requires it. As an alternative, leave **Use Tailscale** disabled, keep bridge networking, and reach the published host port at `http://UNRAID-TAILSCALE-IP:HOST_PORT`; this shares the Unraid host's Tailnet identity rather than giving the application its own identity.
 
 ## Development
 

@@ -11,6 +11,7 @@
   <Overview>Unofficial all-in-one packaging of PokéCollector with PostgreSQL, FastAPI, React, and nginx. Only the web interface is published.</Overview>
   <Category>Productivity: Tools:</Category>
   <WebUI>http://[IP]:[PORT:3000]/</WebUI>
+  <TailscaleStateDir>/config/.tailscale_state</TailscaleStateDir>
   <Config Name="Persistent configuration" Target="/config" Default="/mnt/user/appdata/pokecollector-aio" Mode="rw" Description="All database, uploads, backups, and authentication state." Type="Path" Display="always" Required="true" Mask="false"/>
   <Config Name="Web UI" Target="3000" Default="3000" Mode="tcp" Description="PokéCollector web interface." Type="Port" Display="always" Required="true" Mask="false"/>
   <Config Name="Database password" Target="POSTGRES_PASSWORD" Default="" Description="Required strong password; never change after first initialization." Type="Variable" Display="always" Required="true" Mask="true"/>

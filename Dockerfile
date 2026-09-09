@@ -39,10 +39,11 @@ COPY --from=source /src/VERSION /opt/pokecollector/VERSION
 COPY --from=frontend /src/frontend/dist /usr/share/nginx/html
 COPY rootfs/ /
 RUN chmod +x /usr/local/bin/aio-entrypoint /usr/local/bin/start-backend /usr/local/bin/aio-healthcheck \
- && mkdir -p /config /run/postgresql /run/nginx /var/log/supervisor
+ && mkdir -p /config /run/postgresql /run/nginx /var/log/supervisor /app \
+ && ln -s /config/backups /app/backups
 
 ENV WEB_PORT=3000 POSTGRES_USER=pokemon POSTGRES_DB=pokemon_tcg \
-    DATA_DIR=/config/app AUTH_DATA_DIR=/config/auth BACKUP_DIR=/config/backups \
+    JWT_SECRET_FILE=/config/auth/jwt_secret.key BACKUP_DIR=/config/backups \
     SCAN_UPLOAD_DIR=/config/uploads SCAN_TRACE_STORAGE_DIR=/config/scan-traces \
     POKEDEX_IMAGE_CACHE_DIR=/config/app/pokedex-images \
     DEBUG_LOG_PATH=/config/logs/pokecollector-debug.log \
